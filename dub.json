@@ -1,0 +1,17 @@
+{
+    "authors": ["Marko Semet"],
+    "description": "Take notes with touchscreen input.",
+    "homepage": "https://marko10000.tk/redirect/drawofpages",
+    "dependencies": {
+        "gtk-d": "~>3.7.0",
+        "structuresd": "~>1.0.0-beta2"
+    },
+    "license": "GPL-3.0",
+    "name": "drawofpages",
+    "sourcePaths": [
+        "source"
+    ],
+    "targetName": "drawofpages",
+    "targetPath": "bin",
+    "targetType": "executable"
+}
