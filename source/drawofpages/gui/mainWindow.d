@@ -22,6 +22,11 @@ private
 	import gtk.MainWindow;
 }
 
+private class Menu
+{
+	
+}
+
 public class DBMain : MainWindow
 {
 	public this()

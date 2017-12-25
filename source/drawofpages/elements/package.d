@@ -25,40 +25,4 @@ private
 	import structuresd.dimension.rtree;
 }
 
-public class Interaction : GuiInteraction
-{
-	private Point2D c;
-	private Draw draw;
-	private RTree!(Line, Cuboid!2, 127, 64) data;
 
-	public this(Draw draw)
-	{
-		this.draw = draw;
-		this.data = new RTree!(Line, Cuboid!2, 127, 64);
-	}
-
-	public void down(Point2D point, CURSOR_TYPE cursor, double pressure, string cursorID)
-	{
-		this.c = point;
-	}
-	public void contin(Point2D point, CURSOR_TYPE cursor, double pressure, string cursorID)
-	{
-		this.draw.drawLine(this.c, point, 2, Color.BLUE);
-		this.data.insert(Line(Point!2([this.c.dims[0], this.c.dims[1]]), Point!2([point.dims[0], point.dims[1]]), 2));
-		this.draw.redraw();
-		this.c = point;
-	}
-	public void up(Point2D point, CURSOR_TYPE cursor, double pressure, string cursorID)
-	{
-		this.draw.drawLine(this.c, point, 2, Color.BLUE);
-		this.data.insert(Line(Point!2([this.c.dims[0], this.c.dims[1]]), Point!2([point.dims[0], point.dims[1]]), 2));
-		this.draw.redraw();
-	}
-	public void redraw(Square area, Draw target)
-	{
-		foreach(Line line; this.data.query(area))
-		{
-			target.drawLine(line.a, line.b, line.size, Color.RED);
-		}
-	}
-}

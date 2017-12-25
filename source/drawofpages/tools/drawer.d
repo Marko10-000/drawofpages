@@ -14,30 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-module drawofpages;
+module drawofpages.tools.drawer;
 
-private import drawofpages.tools.drawer;
-private import drawofpages.tools.interaction;
-private import drawofpages.gui.drawArea;
-private import drawofpages.draw;
-private import gtk.MainWindow;
-private import gtk.Main;
-
-
-void main(string[] args)
+private
 {
-	Main.init(args);
-	MainWindow win = new MainWindow("Hello World");
-	win.setDefaultSize(800, 600);
-	DrawElement de = new DrawElement();
-	de.getDrawHanlder().drawLine(Point2D([50, 50]), Point2D([100, 100]), 5, Color.RED);
-	DrawThread dt = new DrawThread(de.getDrawHanlder());
-	InteractionSafer ints = new InteractionSafer(dt);
-	ints.currentTool = new DrawLine(de.getDrawHanlder());
-	de.getGuiInteraction() = ints;
-	win.add(de);
-	de.queueDraw();
-	win.showAll();
-	Main.run();
-	dt.stop = true;
+	import drawofpages.draw;
+	import drawofpages.elements.basetypes;
+	import drawofpages.gui;
+	import drawofpages.tools;
+}
+
+public final class DrawLine : Tool
+{
+	mixin CURSOR_FROM_TO!();
+
+	private Draw draw;
+
+	public this(Draw draw)
+	{
+		this.draw = draw;
+	}
+
+	private void _cursorFromTo(Document doc, Point2D from, double fromPressure, Point2D to, double toPressure, CURSOR_TYPE cursor, string cursorID)
+	{
+		doc.data.insert(Line(from, to, 2, Color.BLACK));
+		this.draw.drawLine(from, to, 2, Color.BLUE);
+	}
 }

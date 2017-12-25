@@ -18,6 +18,7 @@ module drawofpages.elements.basetypes;
 
 private
 {
+	import drawofpages.draw;
 	import std.algorithm.comparison;
 	import structuresd.dimension;
 }
@@ -27,13 +28,15 @@ public struct Line
 	Point!2 a;
 	Point!2 b;
 	double size;
+	Color color;
 
 	@nogc
-	public pure nothrow this(Point!2 a, Point!2 b, double size)
+	public pure nothrow this(Point!2 a, Point!2 b, double size, Color color)
 	{
 		this.a = a;
 		this.b = b;
 		this.size = size;
+		this.color = color;
 	}
 
 	@nogc
