@@ -23,7 +23,6 @@ private
 	import drawofpages.gui;
 	import drawofpages.tools;
 	import structuresd.containers.queue;
-	import std.stdio;
 }
 
 package struct CursorInteraction
@@ -33,27 +32,34 @@ package struct CursorInteraction
 	double pressure;
 	string id;
 }
+package struct RedrawInteraction
+{
+	Square box;
+	Draw target;
+}
 
 public class DrawThread : Thread
 {
 	private enum INTERACTION_TYPE
 	{
-		CURSOR_DOWN = 0,
-		CURSOR_CONTIN = 1,
-		CURSOR_UP = 2
+		REDRAW = 0,
+		CURSOR_DOWN = 1,
+		CURSOR_CONTIN = 2,
+		CURSOR_UP = 3
 	}
 	private static struct Interaction
 	{
 		public INTERACTION_TYPE itype;
 		public Document doc;
 		public Tool tool;
+		public Draw draw;
 		union
 		{
 			public CursorInteraction cursor;
+			public RedrawInteraction redraw;
 		}
 	}
 
-	private Draw draw;
 	private Queue!(Interaction, true) queue;
 	public bool stop;
 
@@ -62,7 +68,7 @@ public class DrawThread : Thread
 		Interaction tmp;
 		while(!this.stop)
 		{
-			bool redraw = false;
+			bool[Draw] redraw;
 			while(this.queue.fetch(tmp))
 			{
 				if(tmp.tool is null)
@@ -71,31 +77,34 @@ public class DrawThread : Thread
 				}
 				final switch(tmp.itype)
 				{
+					case INTERACTION_TYPE.REDRAW:
+						redraw[tmp.draw] = true;
+						tmp.doc.redraw(tmp.redraw.box, tmp.redraw.target);
+						break;
 					case INTERACTION_TYPE.CURSOR_DOWN:
-						redraw = true;
+						redraw[tmp.draw] = true;
 						tmp.tool.cursorDown(tmp.doc, tmp.cursor.pos, tmp.cursor.ctype, tmp.cursor.pressure, tmp.cursor.id);
 						break;
 					case INTERACTION_TYPE.CURSOR_CONTIN:
-						redraw = true;
+						redraw[tmp.draw] = true;
 						tmp.tool.cursorContin(tmp.doc, tmp.cursor.pos, tmp.cursor.ctype, tmp.cursor.pressure, tmp.cursor.id);
 						break;
 					case INTERACTION_TYPE.CURSOR_UP:
-						redraw = true;
+						redraw[tmp.draw] = true;
 						tmp.tool.cursorUp(tmp.doc, tmp.cursor.pos, tmp.cursor.ctype, tmp.cursor.pressure, tmp.cursor.id);
 						break;
 				}
 			}
-			if(redraw)
+			foreach(Draw draw; redraw.keys)
 			{
-				this.draw.redraw();
+				draw.redraw();
 			}
 			yield();
 		}
 	}
 
-	public this(Draw draw)
+	public this()
 	{
-		this.draw = draw;
 		this.queue = new Queue!(Interaction, true);
 		this.stop = false;
 		super(&this.run);
@@ -103,7 +112,13 @@ public class DrawThread : Thread
 	}
 
 	pragma(inline, true)
-	public void add(string TYPE)(Document doc, Tool tool, CursorInteraction ci)
+	private void add(ref Interaction interact)
+	{
+		this.queue.insert(interact);
+	}
+
+	pragma(inline, true)
+	public void add(string TYPE)(Document doc, Draw draw, Tool tool, CursorInteraction ci)
 	{
 		Interaction tmp;
 		static if(TYPE == "DOWN")
@@ -125,7 +140,20 @@ public class DrawThread : Thread
 		tmp.doc = doc;
 		tmp.tool = tool;
 		tmp.cursor = ci;
-		this.queue.insert(tmp);
+		tmp.draw = draw;
+		this.add(tmp);
+	}
+
+	pragma(inline, true)
+	public void add(Document doc, Draw draw, RedrawInteraction redraw)
+	{
+		Interaction tmp;
+		tmp.itype = INTERACTION_TYPE.REDRAW;
+		tmp.doc = doc;
+		tmp.tool = voidTool;
+		tmp.draw = draw;
+		tmp.redraw = redraw;
+		this.add(tmp);
 	}
 };
 
@@ -134,12 +162,14 @@ public class InteractionSafer : GuiInteraction
 	private Document document;
 	public Tool currentTool;
 	private DrawThread thread;
+	private Draw draw;
 
-	public this(DrawThread thread)
+	public this(DrawThread thread, Draw draw)
 	{
 		this.document = new Document();
 		this.currentTool = null;
 		this.thread = thread;
+		this.draw = draw;
 	}
 
 	public void down(Point2D point, CURSOR_TYPE cursor, double pressure, string cursorID)
@@ -149,7 +179,7 @@ public class InteractionSafer : GuiInteraction
 		ci.ctype = cursor;
 		ci.pressure = pressure;
 		ci.id = cursorID;
-		thread.add!"DOWN"(this.document, this.currentTool, ci);
+		thread.add!"DOWN"(this.document, this.draw, this.currentTool, ci);
 	}
 	public void contin(Point2D point, CURSOR_TYPE cursor, double pressure, string cursorID)
 	{
@@ -158,7 +188,7 @@ public class InteractionSafer : GuiInteraction
 		ci.ctype = cursor;
 		ci.pressure = pressure;
 		ci.id = cursorID;
-		thread.add!"CONTIN"(this.document, this.currentTool, ci);
+		thread.add!"CONTIN"(this.document, this.draw, this.currentTool, ci);
 	}
 	public void up(Point2D point, CURSOR_TYPE cursor, double pressure, string cursorID)
 	{
@@ -167,10 +197,13 @@ public class InteractionSafer : GuiInteraction
 		ci.ctype = cursor;
 		ci.pressure = pressure;
 		ci.id = cursorID;
-		thread.add!"UP"(this.document, this.currentTool, ci);
+		thread.add!"UP"(this.document, this.draw, this.currentTool, ci);
 	}
 	public void redraw(Square area, Draw target)
 	{
-		this.document.redraw(area, target);
+		RedrawInteraction ri;
+		ri.box = area;
+		ri.target = target;
+		this.thread.add(this.document, this.draw, ri);
 	}
 }

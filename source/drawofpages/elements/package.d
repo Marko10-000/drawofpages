@@ -15,14 +15,3 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 module drawofpages.elements;
-
-private
-{
-	import drawofpages.draw;
-	import drawofpages.elements.basetypes;
-	import drawofpages.gui;
-	import structuresd.dimension;
-	import structuresd.dimension.rtree;
-}
-
-

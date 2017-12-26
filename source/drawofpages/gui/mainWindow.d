@@ -18,7 +18,9 @@ module drawofpages.gui.mainWindow;
 
 private
 {
-	import gtk.Window;
+	import drawofpages.gui.drawArea;
+	import drawofpages.tools.drawer;
+	import drawofpages.tools.interaction;
 	import gtk.MainWindow;
 }
 
@@ -27,10 +29,38 @@ private class Menu
 	
 }
 
-public class DBMain : MainWindow
+public class Tab
 {
+	package string name;
+	package DrawElement drawElement;
+	private InteractionSafer interaction;
+
+	package this(DrawThread drawThread)
+	{
+		this.drawElement = new DrawElement();
+		this.interaction = new InteractionSafer(drawThread, this.drawElement.getDrawHanlder());
+		this.interaction.currentTool = new DrawLine(this.drawElement.getDrawHanlder());
+		this.drawElement.getGuiInteraction() = this.interaction;
+	}
+}
+
+public class DOPMain : MainWindow
+{
+	DrawThread drawThread;
+	Tab tab;
+
 	public this()
 	{
-		super("Drawbook");
+		super("DrawOfPapers");
+		this.setDefaultSize(800, 600); // TODO: Load size from config
+		this.drawThread = new DrawThread();
+		this.tab = new Tab(this.drawThread);
+		this.add(this.tab.drawElement); // TODO: Tab support
+		this.showAll();
+	}
+
+	public void stop()
+	{
+		this.drawThread.stop = true;
 	}
 }

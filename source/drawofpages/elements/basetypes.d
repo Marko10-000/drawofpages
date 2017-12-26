@@ -19,7 +19,6 @@ module drawofpages.elements.basetypes;
 private
 {
 	import drawofpages.draw;
-	import std.algorithm.comparison;
 	import structuresd.dimension;
 }
 

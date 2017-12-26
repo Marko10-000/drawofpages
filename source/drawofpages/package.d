@@ -16,28 +16,14 @@
  */
 module drawofpages;
 
-private import drawofpages.tools.drawer;
-private import drawofpages.tools.interaction;
-private import drawofpages.gui.drawArea;
-private import drawofpages.draw;
-private import gtk.MainWindow;
+private import drawofpages.gui.mainWindow;
 private import gtk.Main;
 
 
 void main(string[] args)
 {
 	Main.init(args);
-	MainWindow win = new MainWindow("Hello World");
-	win.setDefaultSize(800, 600);
-	DrawElement de = new DrawElement();
-	de.getDrawHanlder().drawLine(Point2D([50, 50]), Point2D([100, 100]), 5, Color.RED);
-	DrawThread dt = new DrawThread(de.getDrawHanlder());
-	InteractionSafer ints = new InteractionSafer(dt);
-	ints.currentTool = new DrawLine(de.getDrawHanlder());
-	de.getGuiInteraction() = ints;
-	win.add(de);
-	de.queueDraw();
-	win.showAll();
+	DOPMain mainWindow = new DOPMain();
 	Main.run();
-	dt.stop = true;
+	mainWindow.stop();
 }

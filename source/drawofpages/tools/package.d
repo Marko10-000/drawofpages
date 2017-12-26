@@ -21,7 +21,6 @@ private
 	import drawofpages.draw;
 	import drawofpages.elements.basetypes;
 	import drawofpages.gui;
-	import drawofpages.tools.drawer;
 	import structuresd.dimension;
 	import structuresd.dimension.rtree;
 }
@@ -50,6 +49,15 @@ public interface Tool
 	void cursorContin(Document doc, Point2D point, CURSOR_TYPE cursor, double pressure, string cursorID);
 	void cursorUp(Document doc, Point2D point, CURSOR_TYPE cursor, double pressure, string cursorID);
 }
+
+private class VoidTool : Tool
+{
+	void cursorDown(Document doc, Point2D point, CURSOR_TYPE cursor, double pressure, string cursorID) {}
+	void cursorContin(Document doc, Point2D point, CURSOR_TYPE cursor, double pressure, string cursorID) {}
+	void cursorUp(Document doc, Point2D point, CURSOR_TYPE cursor, double pressure, string cursorID) {}
+}
+
+public __gshared Tool voidTool = new VoidTool();
 
 public mixin template CURSOR_FROM_TO()
 {
