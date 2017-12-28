@@ -237,8 +237,6 @@ private final class DrawHandler : Draw
 				cr.fill();
 			}
 		}
-		cr.save();
-		cr.destroy;
 	}
 }
 
@@ -292,12 +290,13 @@ public class DrawElement : DrawingArea
 			{
 				this._draw(cr);
 			}
+			cr.destroy;
 			return false;
 		});
 		this.addOnButtonPress(delegate bool(Event e, Widget w) {
 			if(this.interatcion is null)
 			{
-				return false;
+				return true;
 			}
 
 			GdkEventButton* geb = e.button();
@@ -307,12 +306,12 @@ public class DrawElement : DrawingArea
 				this.interatcion.down(Point2D([geb.x, geb.y]), tmp.ctype, tmp.pressure, tmp.deviceID);
 			}
 			this.hasDown = true;
-			return false;
+			return true;
 		});
 		this.addOnMotionNotify(delegate bool(Event e, Widget w) {
 			if((this.interatcion is null) || (!this.hasDown))
 			{
-				return false;
+				return true;
 			}
 
 			GdkEventMotion* motion = e.motion();
@@ -321,12 +320,12 @@ public class DrawElement : DrawingArea
 			{
 				this.interatcion.contin(Point2D([motion.x, motion.y]), tmp.ctype, tmp.pressure, tmp.deviceID);
 			}
-			return false;
+			return true;
 		});
 		this.addOnButtonRelease(delegate bool(Event e, Widget w) {
 			if(this.interatcion is null)
 			{
-				return false;
+				return true;
 			}
 
 			GdkEventButton* geb = e.button();
@@ -336,12 +335,12 @@ public class DrawElement : DrawingArea
 			{
 				this.interatcion.up(Point2D([geb.x, geb.y]), tmp.ctype, tmp.pressure, tmp.deviceID);
 			}
-			return false;
+			return true;
 		});
 		this.addOnSizeAllocate(delegate void(Allocation alloc, Widget w) {
 			synchronized(this)
 			{
-				this.dh.grid.resize(alloc.width, alloc.height, this.interatcion);
+				this.dh.grid.resize(alloc.width > 0 ? alloc.width : 1, alloc.height, this.interatcion);
 			}
 		});
 	}

@@ -99,7 +99,7 @@ public class DrawThread : Thread
 			{
 				draw.redraw();
 			}
-			yield();
+			this.sleep(dur!("msecs")(10));
 		}
 	}
 
