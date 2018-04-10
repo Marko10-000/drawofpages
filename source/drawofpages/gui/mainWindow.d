@@ -103,7 +103,7 @@ public class DOPMain : MainWindow
 			this.add(tmp);
 		}
 
-		// Sizegroup
+		// Sizegroup sidebar
 		{
 			SizeGroup tmp = new SizeGroup(GtkSizeGroupMode.HORIZONTAL);
 			tmp.addWidget(this.sideHeaderBar);
@@ -114,13 +114,35 @@ public class DOPMain : MainWindow
 		this.tab = new Tab(this.drawThread);
 		this.main.packStart(this.tab.drawElement, true, true, 0);
 		this.showAll();
-		//this.sidebarInvisible();
+		this.sidebarInvisible();
 	}
 
 	public void sidebarInvisible()
 	{
 		this.sideBarContainer.setVisible(false);
 		this.sideHeaderBar.setVisible(false);
+	}
+
+	public void sidebarShow(string title, Widget data, Widget[] headerFront = [], Widget[] headerBack = [])
+	{
+		// Insert
+		this.sideHeaderBar.setTitle(title);
+		this.sideHeaderBar.removeAll();
+		foreach(Widget i; headerFront)
+		{
+			this.sideHeaderBar.packStart(i);
+		}
+		foreach(Widget i; headerBack)
+		{
+			this.sideHeaderBar.packEnd(i);
+		}
+
+		this.sideBar.removeAll();
+		this.sideBar.add(data);
+
+		// Show
+		this.sideHeaderBar.setVisible(true);
+		this.sideBarContainer.setVisible(true);
 	}
 
 	public void stop()
