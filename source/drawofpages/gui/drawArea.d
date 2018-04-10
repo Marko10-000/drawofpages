@@ -38,6 +38,7 @@ private final class DrawPart
 	public Point2D pos;
 	public double scale;
 	public Square box;
+	package float dpiScale;
 
 	pragma(inline, true)
 	private pure nothrow void updatePoint(ref Point2D p)
@@ -50,16 +51,17 @@ private final class DrawPart
 		s *= this.scale;
 	}
 
-	public this(Point2D pos, double scale)
+	public this(Point2D pos, double scale, float dpiScale)
 	{
-		this.surface = ImageSurface.create(cairo_format_t.ARGB32, 512, 512);
+		this.surface = ImageSurface.create(cairo_format_t.ARGB32, cast(int)(512 * dpiScale), cast(int)(512 * dpiScale));
 		this.context = Context.create(this.surface);
 		this.pos = pos;
 		this.scale = scale;
+		this.dpiScale = dpiScale;
 
 		// Set background color
 		this.context.setSourceRgb(1, 1, 1);
-		this.context.rectangle(0, 0, 512, 512);
+		this.context.rectangle(0, 0, 512 * dpiScale, 512 * dpiScale);
 		this.context.fill();
 
 		// Box
@@ -77,9 +79,9 @@ private final class DrawPart
 		this.updateScale(size);
 
 		this.context.setSourceRgba(color.r, color.g, color.b, color.a);
-		this.context.moveTo(from.dims[0], from.dims[1]);
-		this.context.setLineWidth(size);
-		this.context.lineTo(to.dims[0], to.dims[1]);
+		this.context.moveTo(from.dims[0] * this.dpiScale, from.dims[1] * this.dpiScale);
+		this.context.setLineWidth(size * this.dpiScale);
+		this.context.lineTo(to.dims[0] * this.dpiScale, to.dims[1] * this.dpiScale);
 		this.context.stroke();
 		this.context.moveTo(0, 0);
 	}
@@ -116,6 +118,7 @@ private final class Grid
 	public Point2D rel;
 	public Point2D relZero;
 	public double scale;
+	public double dpiScale;
 	public long x;
 	public long y;
 	public ulong width;
@@ -126,7 +129,7 @@ private final class Grid
 		this.relZero = Point2D([this.x, this.y]) * this.scale;
 	}
 
-	public this()
+	public this(float scale)
 	{
 		this.scale = 1;
 		this.x = -256;
@@ -134,6 +137,7 @@ private final class Grid
 		this.rel = Point2D([this.x, this.y]);
 		this.width = 0;
 		this.height = 0;
+		this.dpiScale = scale;
 		this.parts = new DrawPart[][0];
 		this.calcRelZero();
 	}
@@ -160,7 +164,7 @@ private final class Grid
 						}
 						else
 						{
-							tmp[x] = new DrawPart(Point2D([x, y]) * (512 / this.scale) + this.rel, this.scale);
+							tmp[x] = new DrawPart(Point2D([x, y]) * (512 / this.scale) + this.rel, this.scale, this.dpiScale);
 							interatcion.redraw(tmp[x].box, new PardDraw(tmp[x]));
 						}
 					}
@@ -172,7 +176,7 @@ private final class Grid
 					DrawPart[] tmp = new DrawPart[partsX];
 					for(ulong x = 0; x < partsX; x++)
 					{
-						tmp[x] = new DrawPart(Point2D([x, y]) * (512 / this.scale) + this.rel, this.scale);
+						tmp[x] = new DrawPart(Point2D([x, y]) * (512 / this.scale) + this.rel, this.scale, this.dpiScale);
 						interatcion.redraw(tmp[x].box, new PardDraw(tmp[x]));
 					}
 					newParts[y] = tmp;
@@ -189,6 +193,19 @@ private final class Grid
 			}
 		}
 	}
+
+	package void newDPI(float dpi)
+	{
+		this.dpiScale = dpi;
+		foreach(ref DrawPart[] part; this.parts)
+		{
+			foreach(ulong i; 0..part.length - 1)
+			{
+				DrawPart tmp = part[i];
+				part[i] = new DrawPart(tmp.pos, tmp.scale, this.dpiScale);
+			}
+		}
+	}
 }
 
 private final class DrawHandler : Draw
@@ -196,10 +213,10 @@ private final class DrawHandler : Draw
 	private DrawElement de;
 	package Grid grid;
 
-	public this(DrawElement de)
+	public this(DrawElement de, float dpiScale)
 	{
 		this.de = de;
-		this.grid = new Grid();
+		this.grid = new Grid(dpiScale);
 	}
 
 	public void drawCirc(Point2D center, float radius, Color color)
@@ -225,18 +242,21 @@ private final class DrawHandler : Draw
 		this.de.queueDraw();
 	}
 
-	package void _draw(Context cr)
+	package void _draw(Context cr, float scaling)
 	{
+		cr.save();
+		cr.scale(1 / scaling, 1 / scaling);
 		for(long i = 0; i < this.grid.parts.length; i++)
 		{
 			DrawPart[] io = this.grid.parts[i];
 			for(long j = 0; j < io.length; j++)
 			{
-				cr.setSourceSurface(io[j].surface, (j * 512) + (cast(long) this.grid.x), (i * 512) + (cast(long) this.grid.y));
-				cr.rectangle((j * 512) + (cast(long) this.grid.x), (i * 512) + (cast(long) this.grid.y), 512, 512);
+				cr.setSourceSurface(io[j].surface, ((j * 512) + (cast(long) this.grid.x)) * scaling, ((i * 512) + (cast(long) this.grid.y)) * scaling);
+				cr.rectangle(((j * 512) + (cast(long) this.grid.x)) * scaling, ((i * 512) + (cast(long) this.grid.y)) * scaling, 512 * scaling, 512 * scaling);
 				cr.fill();
 			}
 		}
+		cr.restore();
 	}
 }
 
@@ -245,6 +265,7 @@ public class DrawElement : DrawingArea
 	private DrawHandler dh;
 	private GuiInteraction interatcion = null;
 	private bool hasDown = false;
+	private float dpiTmp;
 
 	private static pure CURSOR_TYPE _getCursor(GdkInputSource gis)
 	{
@@ -284,7 +305,8 @@ public class DrawElement : DrawingArea
 	public this()
 	{
 		super();
-		this.dh = new DrawHandler(this);
+		this.dpiTmp = this.getScaleFactor();
+		this.dh = new DrawHandler(this, this.dpiTmp);
 		this.addOnDraw(delegate bool(Context cr, Widget w) {
 			synchronized
 			{
@@ -341,13 +363,19 @@ public class DrawElement : DrawingArea
 			synchronized(this)
 			{
 				this.dh.grid.resize(alloc.width > 0 ? alloc.width : 1, alloc.height, this.interatcion);
+				float tmp = this.getScaleFactor();
+				if(abs(tmp - this.dpiTmp) > float.epsilon)
+				{
+					this.dpiTmp = tmp;
+					this.dh.grid.newDPI(tmp);
+				}
 			}
 		});
 	}
 
 	private void _draw(Context cr)
 	{
-		this.dh._draw(cr);
+		this.dh._draw(cr, this.dpiTmp);
 	}
 	public DrawHandler getDrawHanlder()
 	{
