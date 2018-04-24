@@ -126,7 +126,7 @@ private final class Grid
 
 	private pure void calcRelZero()
 	{
-		this.relZero = Point2D([this.x, this.y]) * this.scale;
+		this.relZero = Point2D(this.x, this.y) * this.scale;
 	}
 
 	public this(float scale)
@@ -134,7 +134,7 @@ private final class Grid
 		this.scale = 1;
 		this.x = -256;
 		this.y = -256;
-		this.rel = Point2D([this.x, this.y]);
+		this.rel = Point2D(this.x, this.y);
 		this.width = 0;
 		this.height = 0;
 		this.dpiScale = scale;
@@ -164,7 +164,7 @@ private final class Grid
 						}
 						else
 						{
-							tmp[x] = new DrawPart(Point2D([x, y]) * (512 / this.scale) + this.rel, this.scale, this.dpiScale);
+							tmp[x] = new DrawPart(Point2D(x, y) * (512 / this.scale) + this.rel, this.scale, this.dpiScale);
 							interatcion.redraw(tmp[x].box, new PardDraw(tmp[x]));
 						}
 					}
@@ -176,7 +176,7 @@ private final class Grid
 					DrawPart[] tmp = new DrawPart[partsX];
 					for(ulong x = 0; x < partsX; x++)
 					{
-						tmp[x] = new DrawPart(Point2D([x, y]) * (512 / this.scale) + this.rel, this.scale, this.dpiScale);
+						tmp[x] = new DrawPart(Point2D(x, y) * (512 / this.scale) + this.rel, this.scale, this.dpiScale);
 						interatcion.redraw(tmp[x].box, new PardDraw(tmp[x]));
 					}
 					newParts[y] = tmp;
@@ -325,7 +325,7 @@ public class DrawElement : DrawingArea
 			_pointerData tmp = _pointerData(e.getDevice());
 			synchronized
 			{
-				this.interatcion.down(Point2D([geb.x, geb.y]), tmp.ctype, tmp.pressure, tmp.deviceID);
+				this.interatcion.down(Point2D(geb.x, geb.y), tmp.ctype, tmp.pressure, tmp.deviceID);
 			}
 			this.hasDown = true;
 			return true;
@@ -340,7 +340,7 @@ public class DrawElement : DrawingArea
 			_pointerData tmp = _pointerData(e.getDevice());
 			synchronized
 			{
-				this.interatcion.contin(Point2D([motion.x, motion.y]), tmp.ctype, tmp.pressure, tmp.deviceID);
+				this.interatcion.contin(Point2D(motion.x, motion.y), tmp.ctype, tmp.pressure, tmp.deviceID);
 			}
 			return true;
 		});
@@ -355,7 +355,7 @@ public class DrawElement : DrawingArea
 			this.hasDown = false;
 			synchronized
 			{
-				this.interatcion.up(Point2D([geb.x, geb.y]), tmp.ctype, tmp.pressure, tmp.deviceID);
+				this.interatcion.up(Point2D(geb.x, geb.y), tmp.ctype, tmp.pressure, tmp.deviceID);
 			}
 			return true;
 		});

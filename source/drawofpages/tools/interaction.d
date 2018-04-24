@@ -61,7 +61,7 @@ public class DrawThread : Thread
 	}
 
 	private Queue!(Interaction, true) queue;
-	public bool stop;
+	public shared bool stop;
 
 	private void run()
 	{
@@ -117,7 +117,6 @@ public class DrawThread : Thread
 		this.queue.insert(interact);
 	}
 
-	pragma(inline, true)
 	public void add(string TYPE)(Document doc, Draw draw, Tool tool, CursorInteraction ci)
 	{
 		Interaction tmp;
@@ -144,7 +143,6 @@ public class DrawThread : Thread
 		this.add(tmp);
 	}
 
-	pragma(inline, true)
 	public void add(Document doc, Draw draw, RedrawInteraction redraw)
 	{
 		Interaction tmp;
