@@ -1,0 +1,18 @@
+{
+	"authors": [
+		"Marko Semet (Marko10_000) <marko@marko10-000.de>"
+	],
+	"copyright": "Copyright © 2019, Marko Semet (Marko10_000)",
+	"description": "GTK3 frontend of DrawOfPages.",
+	"license": "AGPL-3.0/proprietary",
+	"name": "gtk3",
+	"dependencies": {
+		"gtk-d": "~>3.9.0",
+		"drawofpages": {
+			"path": ".."
+		}
+	},
+	"stringImportPaths": [
+		"models"
+	]
+}

@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/gtk3
+gtk3.so
+gtk3.dylib
+gtk3.dll
+gtk3.a
+gtk3.lib
+gtk3-test-*
+*.exe
+*.o
+*.obj
+*.lst
+drawofpages_gtk3

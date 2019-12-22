@@ -1,0 +1,13 @@
+{
+	"authors": [
+		"Marko Semet (Marko10_000) <marko@marko10-000.de>"
+	],
+	"copyright": "Copyright © 2019, Marko Semet (Marko10_000)",
+	"description": "Take notes with touchscreen input.",
+	"license": "AGPL-3.0/proprietary",
+	"name": "drawofpages",
+	"targetType": "sourceLibrary",
+	"subPackages": [
+		"versGTK3"
+	]
+}

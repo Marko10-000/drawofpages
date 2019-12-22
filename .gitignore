@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/drawofpages
+drawofpages.so
+drawofpages.dylib
+drawofpages.dll
+drawofpages.a
+drawofpages.lib
+drawofpages-test-*
+*.exe
+*.o
+*.obj
+*.lst
