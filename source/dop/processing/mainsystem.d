@@ -40,6 +40,11 @@ public
          +     size = The new brush size
          +/
         shared void setCurrentSize(float size);
+
+        /++
+         + Quit the application
+         +/
+        shared void quit();
     }
 
     /++
@@ -127,6 +132,14 @@ public
                 this.__currentSize = size;
                 this.__callbacks.setCurrentSize(size);
                 return this.__currentSize;
+            }
+
+            /++
+             + Quit the application
+             +/
+            shared void quit()
+            {
+                this.__callbacks.quit();
             }
         }
     }

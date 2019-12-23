@@ -13,6 +13,35 @@
       </object>
     </child>
   </object>
+  <object class="GtkMenu" id="_mainMenu">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="reserve_toggle_size">False</property>
+    <child>
+      <object class="GtkImageMenuItem" id="MenuInfo">
+        <property name="label">gtk-info</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="MenuQuit">
+        <property name="label">gtk-quit</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+      </object>
+    </child>
+  </object>
   <object class="GtkAdjustment" id="_sizeMover">
     <property name="lower">0.01</property>
     <property name="upper">9.9900000000000002</property>
@@ -73,6 +102,22 @@
         <property name="can_focus">False</property>
         <property name="title" translatable="yes">DrawOfPages</property>
         <property name="show_close_button">True</property>
+        <child>
+          <object class="GtkMenuButton">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="popup">_mainMenu</property>
+            <property name="direction">none</property>
+            <property name="use_popover">False</property>
+            <child>
+              <placeholder/>
+            </child>
+          </object>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
         <child>
           <object class="GtkButtonBox">
             <property name="visible">True</property>
@@ -174,12 +219,58 @@
           </object>
           <packing>
             <property name="pack_type">end</property>
+            <property name="position">1</property>
           </packing>
         </child>
       </object>
     </child>
     <child>
       <placeholder/>
+    </child>
+  </object>
+  <object class="GtkAboutDialog" id="AboutDialog">
+    <property name="can_focus">False</property>
+    <property name="type_hint">dialog</property>
+    <property name="attached_to">MainApplication</property>
+    <property name="program_name">DrawOfPages</property>
+    <property name="version">--REPLACE--</property>
+    <property name="copyright" translatable="yes">--GET-REPLACED--</property>
+    <property name="website">https://marko10-000.de/projects/drawofpages</property>
+    <property name="authors">--GET-REPLACED--</property>
+    <property name="documenters">--GET-REPLACED--</property>
+    <property name="translator_credits" translatable="yes">--GET-REPLACED--</property>
+    <property name="artists">--GET-REPLACED--</property>
+    <property name="logo_icon_name">image-missing</property>
+    <property name="license_type">agpl-3-0-only</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
     </child>
   </object>
 </interface>

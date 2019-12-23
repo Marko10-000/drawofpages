@@ -20,11 +20,13 @@ private
 {
     import cairo.Context;
 
+    import dop.authorship;
     import dop.processing.mainsystem;
     import dop.structures.base;
 
     import gdk.RGBA;
 
+    import gtk.AboutDialog;
     import gtk.Application;
     import gtk.ApplicationWindow;
     import gtk.Builder;
@@ -34,6 +36,7 @@ private
     import gtk.Image;
     import gtk.Label;
     import gtk.MenuButton;
+    import gtk.MenuItem;
     import gtk.Range;
     import gtk.Scale;
     import gtk.SpinButton;
@@ -71,6 +74,10 @@ public
             SpinButton __sizeChooser2;
             Label __sizeInfo;
             MenuButton __sizeHelper;
+
+            AboutDialog __menuAboutDialog;
+            MenuItem __menuAbout;
+            MenuItem __menuQuit;
 
             //
             // Colors
@@ -230,6 +237,57 @@ public
                         {
                             this.__sizeChooser1.setValue(this.__mainSystem.currentSize);
                             this.__sizeChooser2.setValue(this.__mainSystem.currentSize);
+                        }
+                    });
+                }
+
+                { // Manage menu entries
+                    this.__menuAboutDialog = cast(AboutDialog) this.__builder.getObject("AboutDialog");
+                    assert(this.__menuAboutDialog !is null);
+                    this.__menuAbout = cast(MenuItem) this.__builder.getObject("MenuInfo");
+                    assert(this.__menuAbout !is null);
+                    this.__menuQuit = cast(MenuItem) this.__builder.getObject("MenuQuit");
+                    assert(this.__menuQuit !is null);
+
+                    // Set infos
+                    this.__menuAboutDialog.setArtists(authorship_artists);
+                    this.__menuAboutDialog.setAuthors(authorship_authors);
+                    this.__menuAboutDialog.setDocumenters(authorship_documenters);
+                    {
+                        string trans = format!("%(%s\n%)")(authorship_translators);
+                        if(trans.length == 0)
+                        {
+                            this.__menuAboutDialog.setTranslatorCredits(null);
+                        }
+                        else
+                        {
+                            this.__menuAboutDialog.setTranslatorCredits(trans[0..$-1]);
+                        }
+                    }
+                    {
+                        string copyright = authorship_copyright_infos;
+                        if(copyright.length > 0)
+                        {
+                            copyright ~= "\n\n";
+                        }
+                        copyright ~= "Used library: GtkD(http://gtkd.org)";
+                        this.__menuAboutDialog.setCopyright(copyright);
+                    }
+                    this.__menuAboutDialog.setVersion(programm_version);
+
+                    // About
+                    this.__menuAbout.addOnActivate(delegate void(MenuItem mi) {
+                        if(mi == this.__menuAbout)
+                        {
+                            this.__menuAboutDialog.showAll();
+                        }
+                    });
+
+                    // Quit
+                    this.__menuQuit.addOnActivate(delegate void(MenuItem mi) {
+                        if(mi == this.__menuQuit)
+                        {
+                            this.__mainSystem.quit();
                         }
                     });
                 }

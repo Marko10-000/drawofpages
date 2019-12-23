@@ -21,6 +21,7 @@ import dop.structures.base;
 import gdk.Threads;
 import gio.Application: GioApplication = Application;
 import gtk.Application;
+import gtk.Main;
 
 private
 {
@@ -28,12 +29,12 @@ private
 	{
 		private
 		{
-			void delegate(void delegate(DOP_MainWindow)) __runWithMainWindow;
+			void delegate(void delegate(DOP_MainWindow, Application)) __runWithMainWindow;
 		}
 
 		public
 		{
-			shared this(void delegate(void delegate(DOP_MainWindow)) func)
+			shared this(void delegate(void delegate(DOP_MainWindow, Application)) func)
 			in
 			{
 				assert(func !is null);
@@ -45,14 +46,21 @@ private
 
 			shared void setCurrentColor(ColorRGBA color)
 			{
-				this.__runWithMainWindow(delegate void(DOP_MainWindow mw) {
+				this.__runWithMainWindow(delegate void(DOP_MainWindow mw, Application app) {
 					mw.updateColor();
 				});
 			}
 			shared void setCurrentSize(float size)
 			{
-				this.__runWithMainWindow(delegate void(DOP_MainWindow mw) {
+				this.__runWithMainWindow(delegate void(DOP_MainWindow mw, Application app) {
 					mw.updateSize(size);
+				});
+			}
+
+			shared void quit()
+			{
+				this.__runWithMainWindow(delegate void(DOP_MainWindow mw, Application app) {
+					app.quit();
 				});
 			}
 		}
@@ -70,9 +78,9 @@ int main(string[] args)
 		DOP_MainWindow mainWindow = new DOP_MainWindow(app);
 
 		// Create main system
-		baseCB = new shared Callbacks(delegate void(void delegate(DOP_MainWindow) func) {
+		baseCB = new shared Callbacks(delegate void(void delegate(DOP_MainWindow, Application) func) {
 			threadsEnter();
-			func(mainWindow);
+			func(mainWindow, app);
 			threadsLeave();
 		});
 		ms = new shared MainSystem(baseCB);
@@ -80,7 +88,6 @@ int main(string[] args)
 
 		// Finalize main system init
 		ms.finalizeInit();
-		mainWindow.updateColor(); // Fix sizing render bug
 	});
 
 	{ // Finalize

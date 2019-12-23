@@ -6,8 +6,11 @@
 	"description": "Take notes with touchscreen input.",
 	"license": "AGPL-3.0/proprietary",
 	"name": "drawofpages",
-	"targetType": "sourceLibrary",
+	"targetType": "library",
 	"subPackages": [
 		"versGTK3"
+	],
+	"stringImportPaths": [
+		"models"
 	]
 }
