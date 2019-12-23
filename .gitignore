@@ -6,10 +6,11 @@ docs/
 drawofpages.so
 drawofpages.dylib
 drawofpages.dll
-drawofpages.a
+libdrawofpages.a
 drawofpages.lib
 drawofpages-test-*
 *.exe
 *.o
 *.obj
 *.lst
+dub.selections.json
